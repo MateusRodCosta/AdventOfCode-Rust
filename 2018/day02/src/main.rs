@@ -3,18 +3,19 @@ use std::fs;
 fn main() {
     let data = fs::read_to_string("input.txt").expect("Unable to read file");
 
-    let boxes: Vec<&str> = data.split_whitespace().collect();
+    let labels: Vec<&str> = data.split_whitespace().collect();
 
-    part_one(&boxes);
+    part_one(&labels);
+    part_two(&labels);
 }
 
-fn part_one(boxes: &Vec<&str>) {
+fn part_one(labels: &[&str]) {
     let alphabet = "abcdefghijklmnopqrstuvwxyz";
 
     let mut total_twice = 0;
     let mut total_thrice = 0;
 
-    for item in boxes {
+    for item in labels {
         let mut twice = false;
         let mut thrice = false;
         for letter in alphabet.chars() {
@@ -39,4 +40,34 @@ fn part_one(boxes: &Vec<&str>) {
         total_thrice,
         total_twice * total_thrice
     );
+}
+
+fn part_two(labels: &[&str]) {
+    let mut found = false;
+    let (mut correct_box1, mut correct_box2) = ("", "");
+
+    for a in labels {
+        for b in labels {
+            let mut differences = 0;
+            for value in a.chars().zip(b.chars()) {
+                let (val1, val2) = value;
+                if val1 != val2 {
+                    differences += 1
+                }
+            }
+            if differences == 1 {
+                found = true;
+                correct_box1 = a;
+                correct_box2 = b;
+                break;
+            }
+        }
+        if found {
+            break;
+        }
+    }
+
+    println!("Box 1: {}", correct_box1);
+
+    println!("Box 2: {}", correct_box2);
 }

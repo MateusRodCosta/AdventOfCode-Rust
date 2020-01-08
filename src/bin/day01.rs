@@ -45,3 +45,8 @@ fn second_part(numbers: &Vec<i32>) {
     }
     println!("Result: {}", value);
 }
+
+#[test]
+fn test1() {
+    assert_eq!(1, 1);
+}

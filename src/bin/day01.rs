@@ -2,51 +2,89 @@ use std::fs;
 
 fn main() {
     let data = fs::read_to_string("input.txt").expect("Unable to read file");
+    let input: Vec<i32> = data.lines().map(|l| l.parse::<i32>().unwrap()).collect();
 
-    let iter = data.split_whitespace();
+    println!("Part One: {}", part1(&input));
 
-    let mut numbers: Vec<i32> = Vec::new();
+    let part2 = part2(&input);
 
-    iter.for_each(|f| {
-        let num = f.parse::<i32>().unwrap();
-        numbers.push(num);
-    });
-
-    first_part(&numbers);
-    second_part(&numbers);
+    println!("Part Two: {}", part2.expect("Couldn't get value"));
 }
 
-fn first_part(numbers: &Vec<i32>) {
-    let mut value = 0;
-
-    for num in numbers {
-        value += num;
-    }
-    println!("Result: {}", value);
+fn part1(input: &[i32]) -> i32 {
+    input.iter().sum()
 }
 
-fn second_part(numbers: &Vec<i32>) {
-    let mut value: i32 = 0;
-
-    let mut vec: Vec<i32> = Vec::new();
-    vec.push(value);
-
-    let mut found = false;
-
-    while !found {
-        for num in numbers {
-            value += num;
-            if vec.contains(&value) {
-                found = true;
-                break;
-            };
-            vec.push(value);
+fn part2(input: &[i32]) -> Option<i32> {
+    let mut previous = vec![0];
+    let mut accumulator = 0;
+    for n in input.iter().cycle() {
+        accumulator += n;
+        if previous.contains(&accumulator) {
+            return Some(accumulator);
         }
+        previous.push(accumulator);
     }
-    println!("Result: {}", value);
+    None
 }
 
 #[test]
-fn test1() {
-    assert_eq!(1, 1);
+fn test_part1_example1() {
+    let example = [1, -2, 3, 1];
+    let result = part1(&example);
+    assert_eq!(result, 3);
+}
+
+#[test]
+fn test_part1_example2() {
+    let example = [1, 1, 1];
+    let result = part1(&example);
+    assert_eq!(result, 3);
+}
+#[test]
+fn test_part1_example3() {
+    let example = [1, 1, -2];
+    let result = part1(&example);
+    assert_eq!(result, 0);
+}
+#[test]
+fn test_part1_example4() {
+    let example = [-1, -2, -3];
+    let result = part1(&example);
+    assert_eq!(result, -6);
+}
+
+#[test]
+fn test_part2_example1() {
+    let example = [1, -2, 3, 1];
+    let result = part2(&example);
+    assert_eq!(result, Some(2));
+}
+
+#[test]
+fn test_part2_example2() {
+    let example = [1, -1];
+    let result = part2(&example);
+    assert_eq!(result, Some(0));
+}
+
+#[test]
+fn test_part2_example3() {
+    let example = [3, 3, 4, -2, -4];
+    let result = part2(&example);
+    assert_eq!(result, Some(10));
+}
+
+#[test]
+fn test_part2_example4() {
+    let example = [-6, 3, 8, 5, -6];
+    let result = part2(&example);
+    assert_eq!(result, Some(5));
+}
+
+#[test]
+fn test_part2_example5() {
+    let example = [7, 7, -2, -7, -4];
+    let result = part2(&example);
+    assert_eq!(result, Some(14));
 }

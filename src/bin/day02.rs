@@ -2,24 +2,20 @@ use std::fs;
 
 fn main() {
     let data = fs::read_to_string("input.txt").expect("Unable to read file");
+    let input: Vec<&str> = data.lines().collect();
 
-    let labels: Vec<&str> = data.split_whitespace().collect();
+    println!("Part One: {}", part1(&input));
 
-    part_one(&labels);
-    part_two(&labels);
+    println!("Part Two: {}", part2(&input));
 }
 
-fn part_one(labels: &[&str]) {
+fn part1(input: &[&str]) -> i32 {
     let alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-    let mut total_twice = 0;
-    let mut total_thrice = 0;
-
-    for item in labels {
-        let mut twice = false;
-        let mut thrice = false;
+    let (mut total_double, mut total_triple) = (0, 0);
+    for value in input.iter() {
+        let (mut twice, mut thrice) = (false, false);
         for letter in alphabet.chars() {
-            let count = item.matches(letter).count();
+            let count = value.matches(letter).count();
             if count == 2 {
                 twice = true;
             }
@@ -28,46 +24,55 @@ fn part_one(labels: &[&str]) {
             }
         }
         if twice {
-            total_twice += 1;
+            total_double += 1;
         }
         if thrice {
-            total_thrice += 1;
+            total_triple += 1;
         }
     }
-    println!(
-        "Twice: {}, Thrice: {}, Checksum: {}",
-        total_twice,
-        total_thrice,
-        total_twice * total_thrice
-    );
+    total_double * total_triple
 }
 
-fn part_two(labels: &[&str]) {
-    let mut found = false;
-    let (mut correct_box1, mut correct_box2) = ("", "");
-
-    for a in labels {
-        for b in labels {
+fn part2(input: &[&str]) -> String {
+    let (mut label1, mut label2) = (String::new(), String::new());
+    for x in input.iter() {
+        for y in input.iter() {
             let mut differences = 0;
-            for value in a.chars().zip(b.chars()) {
-                let (val1, val2) = value;
-                if val1 != val2 {
-                    differences += 1
+            for (a, b) in x.chars().zip(y.chars()) {
+                if a != b {
+                    differences += 1;
                 }
             }
             if differences == 1 {
-                found = true;
-                correct_box1 = a;
-                correct_box2 = b;
+                label1 = x.to_string();
+                label2 = y.to_string();
                 break;
             }
         }
-        if found {
-            break;
-        }
     }
+    let mut result = String::new();
+    label1.chars().zip(label2.chars()).for_each(|(l1, l2)| {
+        if l1 == l2 {
+            result.push(l1);
+        }
+    });
+    result
+}
 
-    println!("Box 1: {}", correct_box1);
+#[test]
+fn test_part1() {
+    let example = [
+        "abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab",
+    ];
+    let result = part1(&example);
+    assert_eq!(result, 12);
+}
 
-    println!("Box 2: {}", correct_box2);
+#[test]
+fn test_part2() {
+    let example = [
+        "abcde", "fghij", "klmno", "pqrst", "fguij", "axcye", "wvxyz",
+    ];
+    let result = part2(&example);
+    assert_eq!(result, "fgij");
 }
